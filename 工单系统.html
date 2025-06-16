@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子工单子平台</title>
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-dark: #1a365d;
+            --primary-medium: #2c5282;
+            --primary-light: #4299e1;
+            --accent: #ed8936;
+            --bg-light: #f8fafc;
+            --text-dark: #2d3748;
+            --text-medium: #4a5568;
+            --text-light: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            grid-template-columns: 240px 1fr;
+            grid-template-areas: 
+                "header header"
+                "sidebar main";
+        }
+        
+        /* 顶部状态栏 */
+        header {
+            grid-area: header;
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .logo i {
+            color: var(--accent);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-info .notification {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .user-info .notification .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+        }
+        
+        .user-info .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* 左侧导航栏 */
+        aside {
+            grid-area: sidebar;
+            background-color: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .nav-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-item {
+            margin: 0.25rem 0;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-medium);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-link:hover {
+            background-color: var(--bg-light);
+            color: var(--primary-medium);
+        }
+        
+        .nav-link.active {
+            background-color: rgba(66, 153, 225, 0.1);
+            color: var(--primary-medium);
+            border-left: 3px solid var(--primary-medium);
+        }
+        
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* 主内容区 */
+        main {
+            grid-area: main;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .page-title i {
+            color: var(--accent);
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.75rem;
+        }
+        
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-medium);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-medium);
+            color: var(--primary-medium);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(66, 153, 225, 0.1);
+        }
+        
+        .btn-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-accent:hover {
+            background-color: #dd6b20;
+        }
+        
+        /* 状态卡片 */
+        .status-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+        
+        .status-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-card.pending {
+            border-top: 4px solid #4299e1;
+        }
+        
+        .status-card.delayed {
+            border-top: 4px solid #f56565;
+        }
+        
+        .status-card.suspended {
+            border-top: 4px solid #f6ad55;
+        }
+        
+        .status-card.completed {
+            border-top: 4px solid #48bb78;
+        }
+        
+        .status-title {
+            font-size: 0.875rem;
+            color: var(--text-medium);
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-change {
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .status-change.up {
+            color: #48bb78;
+        }
+        
+        .status-change.down {
+            color: #f56565;
+        }
+        
+        /* 表格样式 */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        tr:hover {
+            background-color: rgba(66, 153, 225, 0.05);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-pending {
+            background-color: #bee3f8;
+            color: #2b6cb0;
+        }
+        
+        .badge-delayed {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+        
+        .badge-suspended {
+            background-color: #feebc8;
+            color: #b7791f;
+        }
+        
+        .badge-completed {
+            background-color: #c6f6d5;
+            color: #276749;
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            width: 500%;
+            height: 400px;
+            margin-top: 3rem;
+        }
+        
+        /* 流程图容器 */
+        .flowchart-container {
+            width: 700%;
+            height: 400px;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 粒子动画 */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(-100px) translateX(100px);
+            }
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+        }
+        
+        /* 弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-medium);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-medium);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            body {
+                grid-template-rows: auto auto 1fr;
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "sidebar"
+                    "main";
+            }
+            
+            aside {
+                display: none;
+            }
+            
+            .status-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部状态栏 -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-tasks"></i>
+            <span>电子工单子平台</span>
+        </div>
+        <div class="user-info">
+            <div class="notification">
+                <i class="fas fa-bell"></i>
+                <span class="badge">3</span>
+            </div>
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 左侧导航栏 -->
+    <aside>
+        <div class="nav-title">主菜单</div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-target="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>工单看板</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-target="ticket">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>障碍受理</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-target="statistics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>工单统计</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-target="flowchart">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>工单跟踪</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-target="control">
+                    <i class="fas fa-search"></i>
+                    <span>业务控制</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+    
+    <!-- 主内容区 -->
+    <main>
+        <!-- 工单看板 -->
+        <section id="dashboard" class="content-section">
+            <h1 class="page-title">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>工单状态看板</span>
+            </h1>
+            
+            <!-- 状态卡片 -->
+            <div class="status-cards">
+                <div class="status-card pending">
+                    <div class="status-title">待处理工单</div>
+                    <div class="status-value">128</div>
+                    <div class="status-change up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>较昨日 +12%</span>
+                    </div>
+                </div>
+                <div class="status-card delayed">
+                    <div class="status-title">延时工单</div>
+                    <div class="status-value">24</div>
+                    <div class="status-change down">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>较昨日 -5%</span>
+                    </div>
+                </div>
+                <div class="status-card suspended">
+                    <div class="status-title">挂起工单</div>
+                    <div class="status-value">18</div>
+                    <div class="status-change up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>较昨日 +3%</span>
+                    </div>
+                </div>
+                <div class="status-card completed">
+                    <div class="status-title">已结束工单</div>
+                    <div class="status-value">356</div>
+                    <div class="status-change up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>较昨日 +8%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 最近工单表格 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">最近工单</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-filter"></i>
+                            <span>筛选</span>
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            <span>新建工单</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>工单编号</th>
+                                <th>标题</th>
+                                <th>提交时间</th>
+                                <th>优先级</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>WO-20250612-001</td>
+                                <td>网络连接故障</td>
+                                <td>2025-06-12 09:15</td>
+                                <td>高</td>
+                                <td><span class="badge badge-pending">待处理</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250611-045</td>
+                                <td>打印机无法使用</td>
+                                <td>2025-06-11 14:30</td>
+                                <td>中</td>
+                                <td><span class="badge badge-delayed">延时</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250610-078</td>
+                                <td>系统登录问题</td>
+                                <td>2025-06-10 11:20</td>
+                                <td>高</td>
+                                <td><span class="badge badge-suspended">挂起</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250609-112</td>
+                                <td>邮箱配置问题</td>
+                                <td>2025-06-09 16:45</td>
+                                <td>低</td>
+                                <td><span class="badge badge-completed">已结束</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250608-096</td>
+                                <td>软件安装请求</td>
+                                <td>2025-06-08 10:10</td>
+                                <td>中</td>
+                                <td><span class="badge badge-completed">已结束</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 障碍受理模块 -->
+        <section id="ticket" class="content-section" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-ticket-alt"></i>
+                <span>障碍受理</span>
+            </h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">新建工单</h2>
+                </div>
+                <div class="card-body">
+                    <form id="ticket-form">
+                        <div class="form-group">
+                            <label class="form-label" for="ticket-title">工单标题</label>
+                            <input type="text" id="ticket-title" class="form-control" placeholder="请输入工单标题">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ticket-type">工单类型</label>
+                            <select id="ticket-type" class="form-control">
+                                <option value="">请选择工单类型</option>
+                                <option value="network">网络问题</option>
+                                <option value="hardware">硬件问题</option>
+                                <option value="software">软件问题</option>
+                                <option value="account">账户问题</option>
+                                <option value="other">其他问题</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ticket-priority">优先级</label>
+                            <select id="ticket-priority" class="form-control">
+                                <option value="low">低</option>
+                                <option value="medium" selected>中</option>
+                                <option value="high">高</option>
+                                <option value="urgent">紧急</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ticket-description">问题描述</label>
+                            <textarea id="ticket-description" class="form-control" rows="4" placeholder="请详细描述您遇到的问题"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ticket-attachment">附件</label>
+                            <input type="file" id="ticket-attachment" class="form-control">
+                        </div>
+                        <div class="card-actions">
+                            <button type="button" class="btn btn-outline">取消</button>
+                            <button type="submit" class="btn btn-primary">提交工单</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">我的工单</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-filter"></i>
+                            <span>筛选</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>工单编号</th>
+                                <th>标题</th>
+                                <th>提交时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>WO-20250610-078</td>
+                                <td>系统登录问题</td>
+                                <td>2025-06-10 11:20</td>
+                                <td><span class="badge badge-suspended">挂起</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250605-042</td>
+                                <td>打印机无法连接</td>
+                                <td>2025-06-05 14:15</td>
+                                <td><span class="badge badge-completed">已结束</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250528-017</td>
+                                <td>网络速度慢</td>
+                                <td>2025-05-28 09:30</td>
+                                <td><span class="badge badge-completed">已结束</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 工单统计模块 -->
+        <section id="statistics" class="content-section" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-chart-bar"></i>
+                <span>工单统计</span>
+            </h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">工单趋势</h2>
+                    <div class="card-actions">
+                        <select class="form-control" style="width: auto;">
+                            <option>最近7天</option>
+                            <option>最近30天</option>
+                            <option selected>本月</option>
+                            <option>本季度</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container" id="trend-chart"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">工单类型分布</h2>
+                    </div>
+                    <div class="chart-container" id="type-chart"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">处理时效</h2>
+                    </div>
+                    <div class="chart-container" id="duration-chart"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 工单跟踪流程图 -->
+        <section id="flowchart" class="content-section" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-project-diagram"></i>
+                <span>工单跟踪流程</span>
+            </h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">工单流程跟踪</h2>
+                    <div class="card-actions">
+                        <input type="text" class="form-control" placeholder="输入工单编号" style="width: 200px;">
+                        <button class="btn btn-primary">查询</button>
+                    </div>
+                </div>
+                <div class="flowchart-container" id="flow-chart">
+                    <div class="particles" id="particles"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">流程说明</h2>
+                </div>
+                <div class="card-body">
+                    <p>工单处理流程通常包括以下几个阶段：</p>
+                    <ol>
+                        <li><strong>提交工单</strong>：用户提交工单并填写相关信息</li>
+                        <li><strong>工单分配</strong>：系统自动或管理员手动分配工单给处理人员</li>
+                        <li><strong>处理中</strong>：处理人员开始处理工单并更新状态</li>
+                        <li><strong>挂起</strong>（可选）：如需更多信息或等待其他部门响应，工单可能被挂起</li>
+                        <li><strong>解决</strong>：处理人员完成工单并标记为已解决</li>
+                        <li><strong>用户确认</strong>：用户确认问题是否已解决</li>
+                        <li><strong>关闭</strong>：工单最终关闭</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 业务控制查询模块 -->
+        <section id="control" class="content-section" style="display: none;">
+            <h1 class="page-title">
+                <i class="fas fa-search"></i>
+                <span>业务控制查询</span>
+            </h1>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">工单查询</h2>
+                </div>
+                <div class="card-body">
+                    <form class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="form-group">
+                            <label class="form-label" for="search-id">工单编号</label>
+                            <input type="text" id="search-id" class="form-control" placeholder="输入工单编号">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="search-status">状态</label>
+                            <select id="search-status" class="form-control">
+                                <option value="">全部</option>
+                                <option value="pending">待处理</option>
+                                <option value="delayed">延时</option>
+                                <option value="suspended">挂起</option>
+                                <option value="completed">已结束</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="search-date">日期范围</label>
+                            <input type="text" id="search-date" class="form-control" placeholder="选择日期范围">
+                        </div>
+                        <div class="form-group md:col-span-3">
+                            <button type="submit" class="btn btn-primary">查询</button>
+                            <button type="reset" class="btn btn-outline">重置</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">查询结果</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-download"></i>
+                            <span>导出</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>工单编号</th>
+                                <th>标题</th>
+                                <th>提交时间</th>
+                                <th>处理人员</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>WO-20250612-001</td>
+                                <td>网络连接故障</td>
+                                <td>2025-06-12 09:15</td>
+                                <td>张工程师</td>
+                                <td><span class="badge badge-pending">待处理</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                    <button class="btn btn-outline btn-sm">分配</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250611-045</td>
+                                <td>打印机无法使用</td>
+                                <td>2025-06-11 14:30</td>
+                                <td>李工程师</td>
+                                <td><span class="badge badge-delayed">延时</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                    <button class="btn btn-outline btn-sm">分配</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250610-078</td>
+                                <td>系统登录问题</td>
+                                <td>2025-06-10 11:20</td>
+                                <td>王工程师</td>
+                                <td><span class="badge badge-suspended">挂起</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                    <button class="btn btn-outline btn-sm">分配</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WO-20250609-112</td>
+                                <td>邮箱配置问题</td>
+                                <td>2025-06-09 16:45</td>
+                                <td>赵工程师</td>
+                                <td><span class="badge badge-completed">已结束</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">查看</button>
+                                    <button class="btn btn-outline btn-sm">分配</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- 弹窗 -->
+    <div class="modal" id="ticket-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">工单详情</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm text-gray-500">工单编号</p>
+                        <p class="font-medium">WO-20250612-001</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">状态</p>
+                        <p><span class="badge badge-pending">待处理</span></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">提交时间</p>
+                        <p class="font-medium">2025-06-12 09:15</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">优先级</p>
+                        <p class="font-medium">高</p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500">标题</p>
+                    <p class="font-medium">网络连接故障</p>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500">问题描述</p>
+                    <p>办公室网络连接不稳定，时断时续，严重影响工作。已尝试重启路由器和电脑，问题依旧存在。</p>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500">附件</p>
+                    <div class="flex gap-2">
+                        <div class="border rounded p-2">
+                            <i class="fas fa-file-image text-blue-500"></i>
+                            <span>网络诊断.png</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500">处理记录</p>
+                    <div class="space-y-2">
+                        <div class="border-l-2 border-blue-500 pl-3 py-1">
+                            <p class="text-sm font-medium">张工程师</p>
+                            <p class="text-sm">已接收工单，正在排查网络问题</p>
+                            <p class="text-xs text-gray-500">2025-06-12 10:30</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline">关闭</button>
+                <button class="btn btn-primary">更新状态</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 导航切换
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 更新活动状态
+                document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 隐藏所有内容区
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // 显示目标内容区
+                const target = this.getAttribute('data-target');
+                document.getElementById(target).style.display = 'block';
+            });
+        });
+        
+        // 初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 趋势图
+            const trendChart = echarts.init(document.getElementById('trend-chart'));
+            trendChart.setOption({
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['新建工单', '处理中工单', '已结束工单']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['6/1', '6/2', '6/3', '6/4', '6/5', '6/6', '6/7', '6/8', '6/9', '6/10', '6/11', '6/12']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '新建工单',
+                        type: 'line',
+                        smooth: true,
+                        data: [12, 15, 8, 18, 11, 9, 14, 16, 13, 17, 20, 15],
+                        lineStyle: {
+                            color: '#4299e1'
+                        },
+                        itemStyle: {
+                            color: '#4299e1'
+                        }
+                    },
+                    {
+                        name: '处理中工单',
+                        type: 'line',
+                        smooth: true,
+                        data: [28, 32, 35, 30, 34, 38, 36, 32, 30, 34, 36, 40],
+                        lineStyle: {
+                            color: '#f6ad55'
+                        },
+                        itemStyle: {
+                            color: '#f6ad55'
+                        }
+                    },
+                    {
+                        name: '已结束工单',
+                        type: 'line',
+                        smooth: true,
+                        data: [20, 18, 22, 25, 28, 24, 26, 30, 32, 28, 30, 35],
+                        lineStyle: {
+                            color: '#48bb78'
+                        },
+                        itemStyle: {
+                            color: '#48bb78'
+                        }
+                    }
+                ]
+            });
+            
+            // 类型分布图
+            const typeChart = echarts.init(document.getElementById('type-chart'));
+            typeChart.setOption({
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: '工单类型',
+                        type: 'pie',
+                        radius: '70%',
+                        data: [
+                            { value: 45, name: '网络问题' },
+                            { value: 30, name: '硬件问题' },
+                            { value: 15, name: '软件问题' },
+                            { value: 10, name: '账户问题' }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+                        itemStyle: {
+                            color: function(params) {
+                                const colorList = ['#4299e1', '#f56565', '#f6ad55', '#48bb78'];
+                                return colorList[params.dataIndex];
+                            }
+                        }
+                    }
+                ]
+            });
+            
+            // 处理时效图
+            const durationChart = echarts.init(document.getElementById('duration-chart'));
+            durationChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    boundaryGap: [0, 0.01]
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['网络问题', '硬件问题', '软件问题', '账户问题']
+                },
+                series: [
+                    {
+                        name: '平均处理时间(小时)',
+                        type: 'bar',
+                        data: [12, 18, 8, 6],
+                        itemStyle: {
+                            color: function(params) {
+                                const colorList = ['#4299e1', '#f56565', '#f6ad55', '#48bb78'];
+                                return colorList[params.dataIndex];
+                            }
+                        }
+                    }
+                ]
+            });
+            
+            // 流程图
+            const flowChart = echarts.init(document.getElementById('flow-chart'));
+            flowChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    triggerOn: 'mousemove'
+                },
+                series: [
+                    {
+                        type: 'graph',
+                        layout: 'none',
+                        symbolSize: 50,
+                        roam: true,
+                        label: {
+                            show: true
+                        },
+                        edgeSymbol: ['circle', 'arrow'],
+                        edgeSymbolSize: [4, 10],
+                        edgeLabel: {
+                            fontSize: 20
+                        },
+                        data: [
+                            {
+                                name: '提交工单',
+                                x: 100,
+                                y: 200,
+                                itemStyle: {
+                                    color: '#4299e1'
+                                }
+                            },
+                            {
+                                name: '工单分配',
+                                x: 300,
+                                y: 200,
+                                itemStyle: {
+                                    color: '#f6ad55'
+                                }
+                            },
+                            {
+                                name: '处理中',
+                                x: 500,
+                                y: 200,
+                                itemStyle: {
+                                    color: '#f56565'
+                                }
+                            },
+                            {
+                                name: '挂起',
+                                x: 500,
+                                y: 350,
+                                itemStyle: {
+                                    color: '#f6ad55'
+                                }
+                            },
+                            {
+                                name: '解决',
+                                x: 700,
+                                y: 200,
+                                itemStyle: {
+                                    color: '#48bb78'
+                                }
+                            },
+                            {
+                                name: '用户确认',
+                                x: 900,
+                                y: 200,
+                                itemStyle: {
+                                    color: '#4299e1'
+                                }
+                            },
+                            {
+                                name: '关闭',
+                                x: 1100,
+                                y: 200,
+                                itemStyle: {
+                                    color: '#9f7aea'
+                                }
+                            }
+                        ],
+                        links: [
+                            {
+                                source: '提交工单',
+                                target: '工单分配',
+                                lineStyle: {
+                                    color: '#a0aec0'
+                                }
+                            },
+                            {
+                                source: '工单分配',
+                                target: '处理中',
+                                lineStyle: {
+                                    color: '#a0aec0'
+                                }
+                            },
+                            {
+                                source: '处理中',
+                                target: '挂起',
+                                lineStyle: {
+                                    color: '#a0aec0'
+                                }
+                            },
+                            {
+                                source: '挂起',
+                                target: '处理中',
+                                lineStyle: {
+                                    color: '#a0aec0'
+                                }
+                            },
+                            {
+                                source: '处理中',
+                                target: '解决',
+                                lineStyle: {
+                                    color: '#a0aec0'
+                                }
+                            },
+                            {
+                                source: '解决',
+                                target: '用户确认',
+                                lineStyle: {
+                                    color: '#a0aec0'
+                                }
+                            },
+                            {
+                                source: '用户确认',
+                                target: '关闭',
+                                lineStyle: {
+                                    color: '#a0aec0'
+                                }
+                            }
+                        ],
+                        lineStyle: {
+                            opacity: 0.9,
+                            width: 2,
+                            curveness: 0
+                        }
+                    }
+                ]
+            });
+            
+            // 粒子动画
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // 随机大小
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // 随机位置
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // 随机动画延迟
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                
+                // 随机颜色
+                const colors = ['#4299e1', '#f56565', '#f6ad55', '#48bb78', '#9f7aea'];
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            // 窗口大小变化时重新调整图表大小
+            window.addEventListener('resize', function() {
+                trendChart.resize();
+                typeChart.resize();
+                durationChart.resize();
+                flowChart.resize();
+            });
+            
+            // 查看工单弹窗
+            const modal = document.getElementById('ticket-modal');
+            const modalClose = document.getElementById('modal-close');
+            
+            document.querySelectorAll('button:contains("查看")').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    modal.classList.add('active');
+                });
+            });
+            
+            modalClose.addEventListener('click', function() {
+                modal.classList.remove('active');
+            });
+            
+            // 点击弹窗外部关闭弹窗
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
