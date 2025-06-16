@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电视管理子平台</title>
+    <link rel="stylesheet" href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css">
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://s2.ssl.qhres2.com/!2dd0bbf7/echats.js"></script>
+    <style>
+        :root {
+            --primary-dark: #1a237e;
+            --primary-medium: #303f9f;
+            --primary-light: #3949ab;
+            --accent: #ff6d00;
+            --accent-light: #ff9100;
+            --bg-light: #f5f5f5;
+            --text-dark: #212121;
+            --text-medium: #757575;
+            --text-light: #e0e0e0;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #f44336;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.08);
+            --transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            grid-template-rows: 60px 1fr 40px;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            grid-column: 1 / 3;
+            background-color: var(--primary-dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: var(--shadow-md);
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-actions button {
+            background: none;
+            border: none;
+            color: white;
+            margin-left: 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .user-actions button:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .user-actions button i {
+            margin-right: 5px;
+        }
+
+        /* 侧边栏导航 */
+        .sidebar {
+            background-color: white;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--text-medium);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-item a:hover {
+            background-color: #f5f5f5;
+            color: var(--primary-medium);
+        }
+
+        .nav-item a.active {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background-color: var(--accent);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            padding: 20px;
+            overflow-y: auto;
+            background-color: var(--bg-light);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .page-actions button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .page-actions button:hover {
+            background-color: var(--accent-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .page-actions button i {
+            margin-right: 5px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-medium);
+        }
+
+        .card-actions {
+            display: flex;
+        }
+
+        .card-actions button {
+            background: none;
+            border: none;
+            color: var(--text-medium);
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .card-actions button:hover {
+            color: var(--primary-medium);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background-color: var(--primary-medium);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            color: var(--text-medium);
+        }
+
+        .data-table tr:hover td {
+            background-color: #f5f5f5;
+            color: var(--text-dark);
+        }
+
+        .data-table .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .data-table .status.active {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .data-table .status.inactive {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error);
+        }
+
+        .data-table .status.pending {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+
+        /* 搜索框 */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-medium);
+            box-shadow: 0 0 0 2px rgba(48, 63, 159, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-medium);
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        /* 底部状态栏 */
+        .status-bar {
+            grid-column: 1 / 3;
+            background-color: var(--primary-dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 0.8rem;
+        }
+
+        .status-info {
+            display: flex;
+        }
+
+        .status-info span {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-info i {
+            margin-right: 5px;
+            font-size: 0.7rem;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 992px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: -240px;
+                width: 240px;
+                height: calc(100vh - 100px);
+                z-index: 100;
+                transition: var(--transition);
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-content {
+                grid-column: 1;
+            }
+            .menu-toggle {
+                display: block !important;
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        /* 粒子动画效果 */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* 数据概览卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-change.up {
+            color: var(--success);
+        }
+
+        .stat-change.down {
+            color: var(--error);
+        }
+
+        .stat-change i {
+            margin-right: 3px;
+        }
+
+        /* 表单元素 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text-medium);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-medium);
+            box-shadow: 0 0 0 2px rgba(48, 63, 159, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .form-actions button {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .form-actions button:first-child {
+            background-color: var(--primary-medium);
+            color: white;
+            border: none;
+            margin-right: 10px;
+        }
+
+        .form-actions button:first-child:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .form-actions button:last-child {
+            background-color: white;
+            color: var(--text-medium);
+            border: 1px solid #e0e0e0;
+        }
+
+        .form-actions button:last-child:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <div class="top-nav">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">
+                <i class="fas fa-tv"></i>
+                <span>电视管理子平台</span>
+            </div>
+            <div class="user-actions">
+                <button>
+                    <i class="fas fa-bell"></i>
+                    <span>通知</span>
+                </button>
+                <button>
+                    <i class="fas fa-cog"></i>
+                    <span>设置</span>
+                </button>
+                <button>
+                    <i class="fas fa-user"></i>
+                    <span>管理员</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 侧边栏导航 -->
+        <div class="sidebar" id="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="active" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>控制面板</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="boss">
+                        <i class="fas fa-id-card"></i>
+                        <span>BOSS档案管理</span>
+                        <span class="badge">12</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="users">
+                        <i class="fas fa-users"></i>
+                        <span>电视用户档案</span>
+                        <span class="badge">3</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="services">
+                        <i class="fas fa-concierge-bell"></i>
+                        <span>服务明细</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="history">
+                        <i class="fas fa-history"></i>
+                        <span>历史节目查询</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="tv-services">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>电视服务管理</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="products">
+                        <i class="fas fa-box-open"></i>
+                        <span>服务产品管理</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="physical">
+                        <i class="fas fa-boxes"></i>
+                        <span>物理产品管理</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" data-page="pricing">
+                        <i class="fas fa-tags"></i>
+                        <span>资费管理</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 控制面板内容 -->
+            <div id="dashboard-content" class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">控制面板</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-plus"></i>
+                            <span>快速操作</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 数据概览 -->
+                <div class="stats-grid">
+                    <div class="stat-card fade-in delay-1">
+                        <div class="stat-title">总用户数</div>
+                        <div class="stat-value">1,248万</div>
+                        <div class="stat-change up">
+                            <i class="fas fa-arrow-up"></i>
+                            5.2% 较上月
+                        </div>
+                    </div>
+                    <div class="stat-card fade-in delay-2">
+                        <div class="stat-title">活跃用户</div>
+                        <div class="stat-value">892万</div>
+                        <div class="stat-change up">
+                            <i class="fas fa-arrow-up"></i>
+                            2.8% 较上周
+                        </div>
+                    </div>
+                    <div class="stat-card fade-in delay-3">
+                        <div class="stat-title">总收入</div>
+                        <div class="stat-value">3.2亿</div>
+                        <div class="stat-change down">
+                            <i class="fas fa-arrow-down"></i>
+                            1.5% 较上月
+                        </div>
+                    </div>
+                    <div class="stat-card fade-in delay-4">
+                        <div class="stat-title">新增用户</div>
+                        <div class="stat-value">12.4万</div>
+                        <div class="stat-change up">
+                            <i class="fas fa-arrow-up"></i>
+                            8.7% 较上周
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h2 class="card-title">用户增长趋势</h2>
+                        <div class="card-actions">
+                            <button>日</button>
+                            <button>周</button>
+                            <button class="active">月</button>
+                            <button>年</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="user-growth-chart"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card fade-in delay-1">
+                        <div class="card-header">
+                            <h2 class="card-title">热门服务分布</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="service-distribution-chart"></div>
+                        </div>
+                    </div>
+                    <div class="card fade-in delay-2">
+                        <div class="card-header">
+                            <h2 class="card-title">区域用户占比</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="region-distribution-chart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近活动 -->
+                <div class="card fade-in delay-3">
+                    <div class="card-header">
+                        <h2 class="card-title">最近活动</h2>
+                        <div class="card-actions">
+                            <button>查看全部</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>用户</th>
+                                    <th>操作</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2025-06-14 10:23</td>
+                                    <td>张 (ID: 100235)</td>
+                                    <td>订购了"家庭影院套餐"</td>
+                                    <td><span class="status active">成功</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2025-06-14 09:45</td>
+                                    <td>李 (ID: 100876)</td>
+                                    <td>取消了"体育频道包"</td>
+                                    <td><span class="status active">成功</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2025-06-14 08:12</td>
+                                    <td>王 (ID: 100542)</td>
+                                    <td>续费了"基础套餐"</td>
+                                    <td><span class="status pending">处理中</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2025-06-13 22:05</td>
+                                    <td>赵 (ID: 100789)</td>
+                                    <td>投诉了"信号不稳定"</td>
+                                    <td><span class="status active">已处理</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2025-06-13 20:37</td>
+                                    <td>刘 (ID: 100321)</td>
+                                    <td>升级了"4K超清套餐"</td>
+                                    <td><span class="status active">成功</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他页面内容 (初始隐藏) -->
+            <div id="boss-content" class="page-content" style="display:none;">
+                <div class="page-header">
+                    <h1 class="page-title">BOSS档案管理</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-plus"></i>
+                            <span>新增档案</span>
+                        </button>
+                        <button>
+                            <i class="fas fa-download"></i>
+                            <span>导出数据</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索BOSS档案...">
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>姓名</th>
+                                    <th>职位</th>
+                                    <th>部门</th>
+                                    <th>联系方式</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>BOSS001</td>
+                                    <td>张伟</td>
+                                    <td>总经理</td>
+                                    <td>管理层</td>
+                                    <td>1381234</td>
+                                    <td><span class="status active">在职</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>BOSS002</td>
+                                    <td>李娜</td>
+                                    <td>技术总监</td>
+                                    <td>技术部</td>
+                                    <td>1395678</td>
+                                    <td><span class="status active">在职</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>BOSS003</td>
+                                    <td>王芳</td>
+                                    <td>市场总监</td>
+                                    <td>市场部</td>
+                                    <td>1379012</td>
+                                    <td><span class="status active">在职</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 电视用户档案内容 -->
+            <div id="users-content" class="page-content" style="display:none;">
+                <div class="page-header">
+                    <h1 class="page-title">电视用户档案</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-plus"></i>
+                            <span>新增用户</span>
+                        </button>
+                        <button>
+                            <i class="fas fa-filter"></i>
+                            <span>筛选</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索用户...">
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>用户ID</th>
+                                    <th>姓名</th>
+                                    <th>套餐</th>
+                                    <th>开通日期</th>
+                                    <th>到期日期</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>TV100235</td>
+                                    <td>张明</td>
+                                    <td>家庭影院套餐</td>
+                                    <td>2025-05-10</td>
+                                    <td>2026-05-10</td>
+                                    <td><span class="status active">正常</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>TV100876</td>
+                                    <td>李华</td>
+                                    <td>基础套餐</td>
+                                    <td>2025-04-15</td>
+                                    <td>2025-10-15</td>
+                                    <td><span class="status active">正常</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>TV100542</td>
+                                    <td>王芳</td>
+                                    <td>4K超清套餐</td>
+                                    <td>2025-06-01</td>
+                                    <td>2025-12-01</td>
+                                    <td><span class="status active">正常</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                        <button class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务明细内容 -->
+            <div id="services-content" class="page-content" style="display:none;">
+                <div class="page-header">
+                    <h1 class="page-title">服务明细</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-plus"></i>
+                            <span>新增服务</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索服务...">
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>服务ID</th>
+                                    <th>服务名称</th>
+                                    <th>服务类型</th>
+                                    <th>价格</th>
+                                    <th>订阅人数</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>SVC001</td>
+                                    <td>基础套餐</td>
+                                    <td>基础服务</td>
+                                    <td>¥30/月</td>
+                                    <td>450万</td>
+                                    <td><span class="status active">启用</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>SVC002</td>
+                                    <td>家庭影院套餐</td>
+                                    <td>增值服务</td>
+                                    <td>¥60/月</td>
+                                    <td>320万</td>
+                                    <td><span class="status active">启用</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>SVC003</td>
+                                    <td>4K超清套餐</td>
+                                    <td>增值服务</td>
+                                    <td>¥80/月</td>
+                                    <td>180万</td>
+                                    <td><span class="status active">启用</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 历史节目查询内容 -->
+            <div id="history-content" class="page-content" style="display:none;">
+                <div class="page-header">
+                    <h1 class="page-title">历史节目查询</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-filter"></i>
+                            <span>高级筛选</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索节目...">
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>节目ID</th>
+                                    <th>节目名称</th>
+                                    <th>频道</th>
+                                    <th>播出时间</th>
+                                    <th>时长</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PROG001</td>
+                                    <td>新闻联播</td>
+                                    <td>CCTV-1</td>
+                                    <td>2025-06-13 19:00</td>
+                                    <td>30分钟</td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-eye"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PROG002</td>
+                                    <td>天气预报</td>
+                                    <td>CCTV-1</td>
+                                    <td>2025-06-13 19:30</td>
+                                    <td>10分钟</td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-eye"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PROG003</td>
+                                    <td>焦点访谈</td>
+                                    <td>CCTV-1</td>
+                                    <td>2025-06-13 19:40</td>
+                                    <td>20分钟</td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-eye"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 电视服务管理内容 -->
+            <div id="tv-services-content" class="page-content" style="display:none;">
+                <div class="page-header">
+                    <h1 class="page-title">电视服务管理</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-plus"></i>
+                            <span>新增服务</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索电视服务...">
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>服务ID</th>
+                                    <th>服务名称</th>
+                                    <th>服务类型</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>TVS001</td>
+                                    <td>直播电视</td>
+                                    <td>基础服务</td>
+                                    <td><span class="status active">运行中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>TVS002</td>
+                                    <td>时移电视</td>
+                                    <td>增值服务</td>
+                                    <td><span class="status active">运行中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>TVS003</td>
+                                    <td>回看服务</td>
+                                    <td>增值服务</td>
+                                    <td><span class="status active">运行中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务产品管理内容 -->
+            <div id="products-content" class="page-content" style="display:none;">
+                <div class="page-header">
+                    <h1 class="page-title">服务产品管理</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-plus"></i>
+                            <span>新增产品</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索服务产品...">
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>产品ID</th>
+                                    <th>产品名称</th>
+                                    <th>产品类型</th>
+                                    <th>价格</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PRD001</td>
+                                    <td>基础套餐</td>
+                                    <td>基础服务</td>
+                                    <td>¥30/月</td>
+                                    <td><span class="status active">销售中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PRD002</td>
+                                    <td>家庭影院套餐</td>
+                                    <td>组合服务</td>
+                                    <td>¥60/月</td>
+                                    <td><span class="status active">销售中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PRD003</td>
+                                    <td>4K超清套餐</td>
+                                    <td>高端服务</td>
+                                    <td>¥80/月</td>
+                                    <td><span class="status active">销售中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 物理产品管理内容 -->
+            <div id="physical-content" class="page-content" style="display:none;">
+                <div class="page-header">
+                    <h1 class="page-title">物理产品管理</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-plus"></i>
+                            <span>新增产品</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索物理产品...">
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>产品ID</th>
+                                    <th>产品名称</th>
+                                    <th>产品类型</th>
+                                    <th>库存</th>
+                                    <th>价格</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PHY001</td>
+                                    <td>4K智能机顶盒</td>
+                                    <td>硬件设备</td>
+                                    <td>1,245</td>
+                                    <td>¥399</td>
+                                    <td><span class="status active">销售中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PHY002</td>
+                                    <td>高清机顶盒</td>
+                                    <td>硬件设备</td>
+                                    <td>2,876</td>
+                                    <td>¥299</td>
+                                    <td><span class="status active">销售中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PHY003</td>
+                                    <td>智能遥控器</td>
+                                    <td>配件</td>
+                                    <td>5,432</td>
+                                    <td>¥99</td>
+                                    <td><span class="status active">销售中</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 资费管理内容 -->
+            <div id="pricing-content" class="page-content" style="display:none;">
+                <div class="page-header">
+                    <h1 class="page-title">资费管理</h1>
+                    <div class="page-actions">
+                        <button>
+                            <i class="fas fa-plus"></i>
+                            <span>新增资费</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索资费方案...">
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>资费ID</th>
+                                    <th>资费名称</th>
+                                    <th>资费类型</th>
+                                    <th>价格</th>
+                                    <th>有效期</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PRC001</td>
+                                    <td>基础套餐月费</td>
+                                    <td>月费</td>
+                                    <td>¥30</td>
+                                    <td>1个月</td>
+                                    <td><span class="status active">启用</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PRC002</td>
+                                    <td>家庭影院套餐年费</td>
+                                    <td>年费</td>
+                                    <td>¥600</td>
+                                    <td>1年</td>
+                                    <td><span class="status active">启用</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PRC003</td>
+                                    <td>4K超清套餐季费</td>
+                                    <td>季费</td>
+                                    <td>¥210</td>
+                                    <td>3个月</td>
+                                    <td><span class="status active">启用</span></td>
+                                    <td>
+                                        <button class="text-blue-600 hover:text-blue-800"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部状态栏 -->
+        <div class="status-bar">
+            <div class="status-info">
+                <span>
+                    <i class="fas fa-server"></i>
+                    <span>服务器状态: 正常</span>
+                </span>
+                <span>
+                    <i class="fas fa-database"></i>
+                    <span>数据库连接: 活跃</span>
+                </span>
+                <span>
+                    <i class="fas fa-clock"></i>
+                    <span>最后同步: 2025-06-14 11:23:45</span>
+                </span>
+            </div>
+            <div>
+                <span>© 2025 电视服务管理系统 版权所有</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 粒子动画容器 -->
+    <canvas id="particles" class="particles"></canvas>
+
+    <script>
+        // 页面切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 导航菜单点击事件
+            const navLinks = document.querySelectorAll('.nav-menu a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 移除所有active类
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // 添加当前active类
+                    this.classList.add('active');
+                    
+                    // 隐藏所有内容区
+                    const contents = document.querySelectorAll('.page-content');
+                    contents.forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    
+                    // 显示当前内容区
+                    const pageId = this.getAttribute('data-page') + '-content';
+                    document.getElementById(pageId).style.display = 'block';
+                });
+            });
+            
+            // 移动端菜单切换
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+            
+            // 初始化图表
+            initCharts();
+            
+            // 初始化粒子动画
+            initParticles();
+        });
+        
+        // 初始化图表
+        function initCharts() {
+            // 用户增长趋势图
+            const userGrowthChart = echarts.init(document.getElementById('user-growth-chart'));
+            userGrowthChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: '{b}<br/>{a0}: {c0}万<br/>{a1}: {c1}万'
+                },
+                legend: {
+                    data: ['新增用户', '活跃用户'],
+                    right: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['1月', '2月', '3月', '4月', '5月', '6月']
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}万'
+                    }
+                },
+                series: [
+                    {
+                        name: '新增用户',
+                        type: 'line',
+                        smooth: true,
+                        data: [8.2, 9.5, 10.3, 11.2, 12.1, 12.4],
+                        lineStyle: {
+                            width: 3,
+                            color: '#ff6d00'
+                        },
+                        itemStyle: {
+                            color: '#ff6d00'
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(255, 109, 0, 0.3)' },
+                                { offset: 1, color: 'rgba(255, 109, 0, 0.1)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: '活跃用户',
+                        type: 'line',
+                        smooth: true,
+                        data: [820, 835, 848, 865, 880, 892],
+                        lineStyle: {
+                            width: 3,
+                            color: '#3949ab'
+                        },
+                        itemStyle: {
+                            color: '#3949ab'
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(57, 73, 171, 0.3)' },
+                                { offset: 1, color: 'rgba(57, 73, 171, 0.1)' }
+                            ])
+                        }
+                    }
+                ]
+            });
+            
+            // 热门服务分布图
+            const serviceDistributionChart = echarts.init(document.getElementById('service-distribution-chart'));
+            serviceDistributionChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c}万 ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    right: 10,
+                    top: 'center',
+                    data: ['基础套餐', '家庭影院套餐', '4K超清套餐', '体育频道包', '儿童频道包']
+                },
+                series: [
+                    {
+                        name: '服务分布',
+                        type: 'pie',
+                        radius: ['50%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 450, name: '基础套餐', itemStyle: { color: '#1a237e' } },
+                            { value: 320, name: '家庭影院套餐', itemStyle: { color: '#303f9f' } },
+                            { value: 180, name: '4K超清套餐', itemStyle: { color: '#3949ab' } },
+                            { value: 150, name: '体育频道包', itemStyle: { color: '#5c6bc0' } },
+                            { value: 120, name: '儿童频道包', itemStyle: { color: '#7986cb' } }
+                        ]
+                    }
+                ]
+            });
+            
+            // 区域用户占比图
+            const regionDistributionChart = echarts.init(document.getElementById('region-distribution-chart'));
+            regionDistributionChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}万'
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['华东', '华北', '华南', '华中', '西南', '西北', '东北']
+                },
+                series: [
+                    {
+                        name: '用户数',
+                        type: 'bar',
+                        data: [320, 280, 240, 180, 150, 90, 60],
+                        itemStyle: {
+                            color: function(params) {
+                                const colorList = ['#1a237e', '#303f9f', '#3949ab', '#5c6bc0', '#7986cb', '#9fa8da', '#c5cae9'];
+                                return colorList[params.dataIndex];
+                            }
+                        },
+                        label: {
+                            show: true,
+                            position: 'right',
+                            formatter: '{c}万'
+                        }
+                    }
+                ]
+            });
+            
+            // 窗口大小变化时重绘图表
+            window.addEventListener('resize', function() {
+                userGrowthChart.resize();
+                serviceDistributionChart.resize();
+                regionDistributionChart.resize();
+            });
+        }
+        
+        // 初始化粒子动画
+        function initParticles() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置画布大小为窗口大小
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // 粒子数组
+            const particles = [];
+            const particleCount = Math.floor(window.innerWidth / 10);
+            
+            // 创建粒子
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    speedX: Math.random() * 2 - 1,
+                    speedY: Math.random() * 2 - 1,
+                    color: `rgba(57, 73, 171, ${Math.random() * 0.5 + 0.1})`
+                });
+            }
+            
+            // 动画循环
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 更新和绘制粒子
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    
+                    // 更新位置
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    
+                    // 边界检查
+                    if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+                    
+                    // 绘制粒子
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    
+                    // 绘制连线
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const dx = p.x - p2.x;
+                        const dy = p.y - p2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(57, 73, 171, ${1 - distance / 100})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // 开始动画
+            animate();
+            
+            // 窗口大小变化时重置画布
+            window.addEventListener('resize', function() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+    </script>
+</body>
+</html>
