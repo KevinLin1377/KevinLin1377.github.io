@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>话费营收子平台</title>
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css" rel="stylesheet">
+    <script src="https://s2.ssl.qhres2.com/!2dd0bbf7/echats.js"></script>
+    <style>
+        :root {
+            --primary-dark: #1a237e;
+            --primary-light: #303f9f;
+            --accent: #ff6d00;
+            --accent-light: #ff9e40;
+            --bg-light: #f5f5f5;
+            --text-dark: #212121;
+            --text-light: #f5f5f5;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: grid;
+            grid-template-rows: auto 1fr;
+            grid-template-columns: auto 1fr;
+            height: 100vh;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            color: var(--text-light);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-title i {
+            margin-right: 0.75rem;
+            color: var(--accent);
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .header-info-item i {
+            color: var(--accent-light);
+        }
+
+        /* 左侧菜单 */
+        .sidebar {
+            background: white;
+            width: 240px;
+            height: 100%;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-collapsed {
+            width: 60px;
+        }
+
+        .sidebar-collapsed .menu-text {
+            display: none;
+        }
+
+        .sidebar-collapsed .menu-item {
+            justify-content: center;
+        }
+
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(48, 63, 159, 0.1);
+        }
+
+        .menu-item.active {
+            background-color: rgba(48, 63, 159, 0.15);
+            border-left: 3px solid var(--accent);
+            color: var(--primary-light);
+        }
+
+        .menu-item i {
+            color: var(--primary-light);
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-text {
+            font-weight: 500;
+        }
+
+        .toggle-sidebar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: var(--primary-light);
+        }
+
+        .toggle-sidebar:hover {
+            color: var(--accent);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            background-color: var(--bg-light);
+            position: relative;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: var(--accent-light);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-light);
+            color: var(--primary-light);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(48, 63, 159, 0.1);
+        }
+
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background-color: var(--primary-light);
+            color: white;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background-color: rgba(48, 63, 159, 0.05);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-paid {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-unpaid {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(48, 63, 159, 0.2);
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            width: 500%;
+            height: 400px;
+            position: relative;
+        }
+
+        /* 粒子动画背景 */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 20;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                grid-column: 1 / -1;
+            }
+            
+            .header-info {
+                gap: 0.75rem;
+            }
+            
+            .header-info-item span {
+                display: none;
+            }
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .tree-container {
+                flex-direction: column;
+            }
+            .tree-nav {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--gray-medium);
+                padding-right: 0;
+                padding-bottom: 1rem;
+                margin-bottom: 1rem;
+            }
+            .tree-content {
+                padding-left: 0;
+            }
+        }
+
+        /* 业务受理表单样式 */
+        .form-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .form-title i {
+            margin-right: 0.75rem;
+            color: var(--accent);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-medium);
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(221, 107, 32, 0.2);
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--white);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-light);
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary-dark);
+            border: 1px solid var(--gray-medium);
+            margin-right: 0.75rem;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-light);
+        }
+
+        /* 订单查询表格样式 */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .table th {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+
+        .table tr:hover {
+            background-color: var(--gray-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: #f0fff4;
+            color: #38a169;
+        }
+
+        .badge-warning {
+            background-color: #fffaf0;
+            color: #dd6b20;
+        }
+
+        .badge-danger {
+            background-color: #fff5f5;
+            color: #e53e3e;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .page-item {
+            margin: 0 0.25rem;
+        }
+
+        .page-link {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-medium);
+            border-radius: 0.25rem;
+            color: var(--primary-dark);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .page-link:hover {
+            background-color: var(--gray-light);
+        }
+
+        .page-link.active {
+            background-color: var(--accent);
+            color: var(--white);
+            border-color: var(--accent);
+        }
+
+        /* 参数设置树形结构样式 */
+        .tree-container {
+            display: flex;
+            min-height: 500px;
+        }
+
+        .tree-nav {
+            width: 240px;
+            border-right: 1px solid var(--gray-medium);
+            padding-right: 1rem;
+            overflow-y: auto;
+        }
+
+        .tree-content {
+            flex: 1;
+            padding-left: 1.5rem;
+        }
+
+        .tree-item {
+            padding: 0.5rem 0;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .tree-item:hover {
+            color: var(--accent);
+        }
+
+        .tree-item.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .tree-item.has-children::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 0;
+            top: 0.5rem;
+            font-size: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .tree-item.has-children.collapsed::after {
+            transform: rotate(-90deg);
+        }
+
+        .tree-subitems {
+            padding-left: 1rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .tree-subitems.show {
+            max-height: 1000px;
+        }
+
+        .param-form {
+            max-width: 600px;
+        }
+
+
+        /* 隐藏所有内容区域，只显示活动的 */
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="header-title">
+            <i class="fas fa-network-wired"></i>
+            <span>话费营收子平台</span>
+        </div>
+        <div class="header-info">
+            <div class="header-info-item">
+                <i class="fas fa-user"></i>
+                <span>操作员: 张三</span>
+            </div>
+            <div class="header-info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>2025年6月14日</span>
+            </div>
+            <div class="header-info-item">
+                <i class="fas fa-clock"></i>
+                <span id="current-time">14:30:25</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 左侧菜单 -->
+    <aside class="sidebar">
+        <div class="toggle-sidebar">
+            <i class="fas fa-chevron-left" id="toggle-sidebar-btn"></i>
+        </div>
+        <ul class="menu">
+            <li class="menu-item active" data-section="phone-charge">
+                <i class="fas fa-phone-alt"></i>
+                <span class="menu-text">电话收费</span>
+            </li>
+            <li class="menu-item" data-section="broadband-charge">
+                <i class="fas fa-wifi"></i>
+                <span class="menu-text">宽带收费</span>
+            </li>
+            <li class="menu-item" data-section="tv-charge">
+                <i class="fas fa-tv"></i>
+                <span class="menu-text">电视收费</span>
+            </li>
+            <li class="menu-item" data-section="comprehensive-query">
+                <i class="fas fa-search"></i>
+                <span class="menu-text">综合查询</span>
+            </li>
+            <li class="menu-item" data-section="statistical-report">
+                <i class="fas fa-chart-bar"></i>
+                <span class="menu-text">统计报表</span>
+            </li>
+            <!-- 业务受理及子栏目 -->
+        
+        <li class="menu-item" data-section="phone-service">
+            <i class="fas fa-phone-alt"></i>
+            <span class="menu-text">电话业务</span>
+        </li>
+        <li class="menu-item" data-section="broadband-service">
+            <i class="fas fa-wifi"></i>
+            <span class="menu-text">宽带业务</span>
+        </li>
+        <li class="menu-item" data-section="tv-service">
+            <i class="fas fa-tv"></i>
+            <span class="menu-text">电视业务</span>
+        </li>
+
+        <!-- 订单查询及子栏目 -->
+
+        <li class="menu-item" data-section="order-list">
+            <i class="fas fa-list-ol"></i>
+            <span class="menu-text">订单列表</span>
+        </li>
+        <li class="menu-item" data-section="order-stats">
+            <i class="fas fa-chart-line"></i>
+            <span class="menu-text">订单统计</span>
+        </li>
+
+        <!-- 系统设置及子栏目 -->
+        
+        <li class="menu-item" data-section="param-settings">
+            <i class="fas fa-coins"></i>
+            <span class="menu-text">营收参数</span>
+        </li>
+        </ul>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 粒子动画背景 -->
+        <div class="particles" id="particles-js"></div>
+
+        <!-- 电话收费内容 -->
+        <section class="content-section active" id="phone-charge">
+            <div class="content-header">
+                <h2 class="content-title">电话收费管理</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">本月电话收费记录</h3>
+                    <div class="content-actions">
+                        <button class="btn btn-accent">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>刷新</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>客户编号</th>
+                                <th>客户姓名</th>
+                                <th>电话号码</th>
+                                <th>费用(元)</th>
+                                <th>缴费期限</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>C10001</td>
+                                <td>李四</td>
+                                <td>13800138000</td>
+                                <td>68.00</td>
+                                <td>2025-06-15</td>
+                                <td><span class="status status-unpaid">未缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C10002</td>
+                                <td>王五</td>
+                                <td>13900139000</td>
+                                <td>88.00</td>
+                                <td>2025-06-10</td>
+                                <td><span class="status status-paid">已缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C10003</td>
+                                <td>赵六</td>
+                                <td>13700137000</td>
+                                <td>128.00</td>
+                                <td>2025-06-05</td>
+                                <td><span class="status status-paid">已缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C10004</td>
+                                <td>钱七</td>
+                                <td>13600136000</td>
+                                <td>58.00</td>
+                                <td>2025-06-20</td>
+                                <td><span class="status status-unpaid">未缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            
+        </section>
+
+        <!-- 宽带收费内容 -->
+        <section class="content-section" id="broadband-charge">
+            <div class="content-header">
+                <h2 class="content-title">宽带收费管理</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">本月宽带收费记录</h3>
+                    <div class="content-actions">
+                        <button class="btn btn-accent">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>刷新</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>客户编号</th>
+                                <th>客户姓名</th>
+                                <th>宽带账号</th>
+                                <th>套餐类型</th>
+                                <th>费用(元)</th>
+                                <th>缴费期限</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>C20001</td>
+                                <td>孙八</td>
+                                <td>BB10001</td>
+                                <td>100M包年</td>
+                                <td>880.00</td>
+                                <td>2025-06-30</td>
+                                <td><span class="status status-unpaid">未缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C20002</td>
+                                <td>周九</td>
+                                <td>BB10002</td>
+                                <td>200M包月</td>
+                                <td>120.00</td>
+                                <td>2025-06-15</td>
+                                <td><span class="status status-paid">已缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C20003</td>
+                                <td>吴十</td>
+                                <td>BB10003</td>
+                                <td>500M包季</td>
+                                <td>300.00</td>
+                                <td>2025-06-01</td>
+                                <td><span class="status status-paid">已缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+           
+        </section>
+
+        <!-- 电视收费内容 -->
+        <section class="content-section" id="tv-charge">
+            <div class="content-header">
+                <h2 class="content-title">电视收费管理</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">本月电视收费记录</h3>
+                    <div class="content-actions">
+                        <button class="btn btn-accent">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>刷新</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>客户编号</th>
+                                <th>客户姓名</th>
+                                <th>电视账号</th>
+                                <th>套餐类型</th>
+                                <th>费用(元)</th>
+                                <th>缴费期限</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>C30001</td>
+                                <td>郑十一</td>
+                                <td>TV10001</td>
+                                <td>基础套餐</td>
+                                <td>30.00</td>
+                                <td>2025-06-25</td>
+                                <td><span class="status status-unpaid">未缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C30002</td>
+                                <td>王十二</td>
+                                <td>TV10002</td>
+                                <td>豪华套餐</td>
+                                <td>60.00</td>
+                                <td>2025-06-18</td>
+                                <td><span class="status status-paid">已缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C30003</td>
+                                <td>李十三</td>
+                                <td>TV10003</td>
+                                <td>体育套餐</td>
+                                <td>45.00</td>
+                                <td>2025-06-08</td>
+                                <td><span class="status status-paid">已缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            
+        </section>
+
+        <!-- 综合查询内容 -->
+        <section class="content-section" id="comprehensive-query">
+            <div class="content-header">
+                <h2 class="content-title">综合查询</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        <span>查询</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-redo"></i>
+                        <span>重置</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">查询条件</h3>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="form-label">客户编号/姓名</label>
+                            <input type="text" class="form-control" placeholder="请输入客户编号或姓名">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">服务类型</label>
+                            <select class="form-control">
+                                <option value="">全部</option>
+                                <option value="phone">电话</option>
+                                <option value="broadband">宽带</option>
+                                <option value="tv">电视</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">缴费状态</label>
+                            <select class="form-control">
+                                <option value="">全部</option>
+                                <option value="paid">已缴费</option>
+                                <option value="unpaid">未缴费</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">时间范围</label>
+                            <div style="display: flex; gap: 1rem;">
+                                <input type="date" class="form-control">
+                                <span style="align-self: center;">至</span>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">查询结果</h3>
+                    <div class="content-actions">
+                        <button class="btn btn-accent">
+                            <i class="fas fa-download"></i>
+                            <span>导出结果</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>客户编号</th>
+                                <th>客户姓名</th>
+                                <th>服务类型</th>
+                                <th>账号</th>
+                                <th>费用(元)</th>
+                                <th>缴费期限</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>C10001</td>
+                                <td>李四</td>
+                                <td>电话</td>
+                                <td>13800138000</td>
+                                <td>68.00</td>
+                                <td>2025-06-15</td>
+                                <td><span class="status status-unpaid">未缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C20001</td>
+                                <td>孙八</td>
+                                <td>宽带</td>
+                                <td>BB10001</td>
+                                <td>880.00</td>
+                                <td>2025-06-30</td>
+                                <td><span class="status status-unpaid">未缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>C30002</td>
+                                <td>王十二</td>
+                                <td>电视</td>
+                                <td>TV10002</td>
+                                <td>60.00</td>
+                                <td>2025-06-18</td>
+                                <td><span class="status status-paid">已缴费</span></td>
+                                <td>
+                                    <button class="btn btn-outline btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 统计报表内容 -->
+        <section class="content-section" id="statistical-report">
+            <div class="content-header">
+                <h2 class="content-title">统计报表</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>选择时间范围</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出报表</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">收入概览</h3>
+                </div>
+                <div class="card-body" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+                    <div style="background-color: #e3f2fd; padding: 1rem; border-radius: 6px;">
+                        <div style="font-size: 0.9rem; color: #1976d2;">电话收入</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: #0d47a1;">¥12,568.00</div>
+                        <div style="font-size: 0.8rem; color: #666;">环比增长 +8.5%</div>
+                    </div>
+                    <div style="background-color: #e8f5e9; padding: 1rem; border-radius: 6px;">
+                        <div style="font-size: 0.9rem; color: #388e3c;">宽带收入</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: #1b5e20;">¥56,320.00</div>
+                        <div style="font-size: 0.8rem; color: #666;">环比增长 +12.3%</div>
+                    </div>
+                    <div style="background-color: #f3e5f5; padding: 1rem; border-radius: 6px;">
+                        <div style="font-size: 0.9rem; color: #8e24aa;">电视收入</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: #4a148c;">¥8,745.00</div>
+                        <div style="font-size: 0.8rem; color: #666;">环比增长 +5.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">收入趋势</h3>
+                </div>
+                <div class="chart-container" id="income-trend-chart"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">客户分布</h3>
+                </div>
+                <div class="chart-container" id="customer-distribution-chart"></div>
+            </div>
+        </section>
+
+        
+        <!-- 电话业务 -->
+        <section class="content-section" id="phone-service">
+            <div class="content-header">
+                <h2 class="content-title">电话业务管理</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>
+                    <div id="phone-service" class="tab-content">
+                        <h2 class="form-title"><i class="fas fa-phone"></i>电话业务受理</h2>
+                        
+                        <form id="phone-form" class="form-grid">
+                            <div class="form-group">
+                                <label for="customer-name">客户姓名</label>
+                                <input type="text" id="customer-name" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="customer-id">身份证号</label>
+                                <input type="text" id="customer-id" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone-number">电话号码</label>
+                                <input type="tel" id="phone-number" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone-package">套餐选择</label>
+                                <select id="phone-package" class="form-control" required>
+                                    <option value="">请选择套餐</option>
+                                    <option value="basic">基础套餐 (¥30/月)</option>
+                                    <option value="standard">标准套餐 (¥50/月)</option>
+                                    <option value="premium">尊享套餐 (¥80/月)</option>
+                                    <option value="business">商务套餐 (¥120/月)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contract-period">合约期限</label>
+                                <select id="contract-period" class="form-control" required>
+                                    <option value="12">12个月</option>
+                                    <option value="24">24个月</option>
+                                    <option value="36">36个月</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="payment-method">支付方式</label>
+                                <select id="payment-method" class="form-control" required>
+                                    <option value="alipay">支付宝</option>
+                                    <option value="wechat">微信支付</option>
+                                    <option value="bank">银行转账</option>
+                                    <option value="cash">现金支付</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="install-address">安装地址</label>
+                                <input type="text" id="install-address" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="install-date">安装日期</label>
+                                <input type="date" id="install-date" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary">重置</button>
+                                <button type="submit" class="btn btn-primary">提交申请</button>
+                            </div>
+                        </form>
+                    </div>
+        </section>           
+                    <!-- 宽带业务 -->
+        <section class="content-section" id="broadband-service">
+            <div class="content-header">
+                <h2 class="content-title">宽带业务管理</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>
+                    <div id="broadband-service" class="tab-content">
+                        <h2 class="form-title"><i class="fas fa-wifi"></i>宽带业务受理</h2>
+                        
+                        <form id="broadband-form" class="form-grid">
+                            <div class="form-group">
+                                <label for="bb-customer-name">客户姓名</label>
+                                <input type="text" id="bb-customer-name" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bb-customer-id">身份证号</label>
+                                <input type="text" id="bb-customer-id" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bb-address">安装地址</label>
+                                <input type="text" id="bb-address" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bb-package">宽带套餐</label>
+                                <select id="bb-package" class="form-control" required>
+                                    <option value="">请选择套餐</option>
+                                    <option value="50m">50M宽带 (¥60/月)</option>
+                                    <option value="100m">100M宽带 (¥80/月)</option>
+                                    <option value="200m">200M宽带 (¥100/月)</option>
+                                    <option value="500m">500M宽带 (¥150/月)</option>
+                                    <option value="1g">1G宽带 (¥200/月)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bb-contract">合约期限</label>
+                                <select id="bb-contract" class="form-control" required>
+                                    <option value="12">12个月</option>
+                                    <option value="24">24个月</option>
+                                    <option value="36">36个月</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bb-equipment">设备选择</label>
+                                <select id="bb-equipment" class="form-control" required>
+                                    <option value="standard">标准光猫 (免费)</option>
+                                    <option value="advanced">高级路由器 (+¥200)</option>
+                                    <option value="premium">企业级设备 (+¥500)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bb-install-date">安装日期</label>
+                                <input type="date" id="bb-install-date" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="bb-install-time">安装时段</label>
+                                <select id="bb-install-time" class="form-control" required>
+                                    <option value="morning">上午 (9:00-12:00)</option>
+                                    <option value="afternoon">下午 (13:00-18:00)</option>
+                                    <option value="evening">晚上 (18:00-21:00)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary">重置</button>
+                                <button type="submit" class="btn btn-primary">提交申请</button>
+                            </div>
+                        </form>
+                    </div>
+        </section>           
+                    <!-- 电视业务 -->
+        <section class="content-section" id="tv-service">
+            <div class="content-header">
+                <h2 class="content-title">电视业务管理</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>
+                    <div id="tv-service" class="tab-content">
+                        <h2 class="form-title"><i class="fas fa-tv"></i>电视业务受理</h2>
+                        
+                        <form id="tv-form" class="form-grid">
+                            <div class="form-group">
+                                <label for="tv-customer-name">客户姓名</label>
+                                <input type="text" id="tv-customer-name" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tv-customer-id">身份证号</label>
+                                <input type="text" id="tv-customer-id" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tv-address">安装地址</label>
+                                <input type="text" id="tv-address" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tv-package">电视套餐</label>
+                                <select id="tv-package" class="form-control" required>
+                                    <option value="">请选择套餐</option>
+                                    <option value="basic">基础套餐 (¥30/月)</option>
+                                    <option value="family">家庭套餐 (¥50/月)</option>
+                                    <option value="premium">尊享套餐 (¥80/月)</option>
+                                    <option value="sports">体育套餐 (¥100/月)</option>
+                                    <option value="movie">电影套餐 (¥120/月)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tv-contract">合约期限</label>
+                                <select id="tv-contract" class="form-control" required>
+                                    <option value="12">12个月</option>
+                                    <option value="24">24个月</option>
+                                    <option value="36">36个月</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tv-box">机顶盒选择</label>
+                                <select id="tv-box" class="form-control" required>
+                                    <option value="standard">标准版 (免费)</option>
+                                    <option value="4k">4K高清版 (+¥300)</option>
+                                    <option value="recording">录像版 (+¥500)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tv-install-date">安装日期</label>
+                                <input type="date" id="tv-install-date" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tv-install-time">安装时段</label>
+                                <select id="tv-install-time" class="form-control" required>
+                                    <option value="morning">上午 (9:00-12:00)</option>
+                                    <option value="afternoon">下午 (13:00-18:00)</option>
+                                    <option value="evening">晚上 (18:00-21:00)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary">重置</button>
+                                <button type="submit" class="btn btn-primary">提交申请</button>
+                            </div>
+                        </form>
+                    </div>
+        </section>            
+                    <!-- 订单列表 -->
+        <section class="content-section" id="order-list">
+            <div class="content-header">
+                <h2 class="content-title">订单列表</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>           
+                    <div id="order-list" class="tab-content">
+                        <h2 class="form-title"><i class="fas fa-list"></i>订单查询</h2>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
+                            <div style="display: flex; gap: 1rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <select class="form-control" style="width: 150px;">
+                                        <option>全部业务类型</option>
+                                        <option>电话业务</option>
+                                        <option>宽带业务</option>
+                                        <option>电视业务</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <select class="form-control" style="width: 150px;">
+                                        <option>全部状态</option>
+                                        <option>待处理</option>
+                                        <option>处理中</option>
+                                        <option>已完成</option>
+                                        <option>已取消</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <input type="text" class="form-control" placeholder="订单号/客户名" style="width: 200px;">
+                                </div>
+                                <button class="btn btn-primary">搜索</button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>订单号</th>
+                                        <th>客户姓名</th>
+                                        <th>业务类型</th>
+                                        <th>套餐</th>
+                                        <th>金额</th>
+                                        <th>创建时间</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ORD20250614001</td>
+                                        <td>张三</td>
+                                        <td>宽带业务</td>
+                                        <td>200M宽带</td>
+                                        <td>¥1200</td>
+                                        <td>2025-06-14 09:15</td>
+                                        <td><span class="badge badge-success">已完成</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ORD20250613045</td>
+                                        <td>李四</td>
+                                        <td>电视业务</td>
+                                        <td>家庭套餐</td>
+                                        <td>¥600</td>
+                                        <td>2025-06-13 14:30</td>
+                                        <td><span class="badge badge-warning">处理中</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ORD20250612089</td>
+                                        <td>王五</td>
+                                        <td>电话业务</td>
+                                        <td>商务套餐</td>
+                                        <td>¥1440</td>
+                                        <td>2025-06-12 11:20</td>
+                                        <td><span class="badge badge-success">已完成</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ORD20250611032</td>
+                                        <td>赵六</td>
+                                        <td>宽带业务</td>
+                                        <td>500M宽带</td>
+                                        <td>¥1800</td>
+                                        <td>2025-06-11 16:45</td>
+                                        <td><span class="badge badge-danger">已取消</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ORD20250610076</td>
+                                        <td>钱七</td>
+                                        <td>电视业务</td>
+                                        <td>电影套餐</td>
+                                        <td>¥1440</td>
+                                        <td>2025-06-10 10:10</td>
+                                        <td><span class="badge badge-warning">处理中</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ORD20250609021</td>
+                                        <td>孙八</td>
+                                        <td>电话业务</td>
+                                        <td>尊享套餐</td>
+                                        <td>¥960</td>
+                                        <td>2025-06-09 13:25</td>
+                                        <td><span class="badge badge-success">已完成</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ORD20250608054</td>
+                                        <td>周九</td>
+                                        <td>宽带业务</td>
+                                        <td>1G宽带</td>
+                                        <td>¥2400</td>
+                                        <td>2025-06-08 15:40</td>
+                                        <td><span class="badge badge-warning">处理中</span></td>
+                                        <td>
+                                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">详情</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="pagination">
+                            <div class="page-item">
+                                <a href="#" class="page-link"><i class="fas fa-angle-left"></i></a>
+                            </div>
+                            <div class="page-item">
+                                <a href="#" class="page-link">1</a>
+                            </div>
+                            <div class="page-item">
+                                <a href="#" class="page-link active">2</a>
+                            </div>
+                            <div class="page-item">
+                                <a href="#" class="page-link">3</a>
+                            </div>
+                            <div class="page-item">
+                                <a href="#" class="page-link">4</a>
+                            </div>
+                            <div class="page-item">
+                                <a href="#" class="page-link">5</a>
+                            </div>
+                            <div class="page-item">
+                                <a href="#" class="page-link"><i class="fas fa-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+        </section>           
+                    <!-- 订单统计 -->
+        <section class="content-section" id="order-stats">
+            <div class="content-header">
+                <h2 class="content-title">订单统计</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>           
+                    <div id="order-stats" class="tab-content">
+                        <h2 class="form-title"><i class="fas fa-chart-bar"></i>订单统计分析</h2>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div style="background: var(--white); border-radius: 0.5rem; padding: 1.5rem; box-shadow: var(--shadow);">
+                                <h3 style="font-size: 1rem; font-weight: 600; color: var(--gray-dark); margin-bottom: 1rem;">本月订单量</h3>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary-dark);">1,248</div>
+                                <div style="font-size: 0.875rem; color: var(--gray-dark); margin-top: 0.5rem;">
+                                    <span style="color: #38a169;">↑ 8%</span> 较上月
+                                </div>
+                            </div>
+                            
+                            <div style="background: var(--white); border-radius: 0.5rem; padding: 1.5rem; box-shadow: var(--shadow);">
+                                <h3 style="font-size: 1rem; font-weight: 600; color: var(--gray-dark); margin-bottom: 1rem;">本月营收</h3>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--primary-dark);">¥1,248万</div>
+                                <div style="font-size: 0.875rem; color: var(--gray-dark); margin-top: 0.5rem;">
+                                    <span style="color: #38a169;">↑ 12%</span> 较上月
+                                </div>
+                            </div>
+                        </div>
+                        
+                       
+                    </div>
+        </section>          
+                    <!-- 营收参数设置 -->
+        <section class="content-section" id="param-settings">
+            <div class="content-header">
+                <h2 class="content-title">营收参数</h2>
+                <div class="content-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>新增记录</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        <span>导出数据</span>
+                    </button>
+                </div>
+            </div>           
+                    <div id="param-settings" class="tab-content">
+                        <h2 class="form-title"><i class="fas fa-cog"></i>营收参数设置</h2>
+                        
+                        <div class="tree-container">
+                            <div class="tree-nav">
+                                <div class="tree-item active">基础参数</div>
+                                <div class="tree-item has-children collapsed" onclick="toggleTreeItem(this)">电话业务</div>
+                                <div class="tree-subitems">
+                                    <div class="tree-item">套餐设置</div>
+                                    <div class="tree-item">资费标准</div>
+                                    <div class="tree-item">优惠活动</div>
+                                </div>
+                                
+                                <div class="tree-item has-children collapsed" onclick="toggleTreeItem(this)">宽带业务</div>
+                                <div class="tree-subitems">
+                                    <div class="tree-item">套餐设置</div>
+                                    <div class="tree-item">资费标准</div>
+                                    <div class="tree-item">设备租赁</div>
+                                </div>
+                                
+                                <div class="tree-item has-children collapsed" onclick="toggleTreeItem(this)">电视业务</div>
+                                <div class="tree-subitems">
+                                    <div class="tree-item">套餐设置</div>
+                                    <div class="tree-item">频道管理</div>
+                                    <div class="tree-item">增值服务</div>
+                                </div>
+                                
+                                <div class="tree-item has-children collapsed" onclick="toggleTreeItem(this)">组合套餐</div>
+                                <div class="tree-subitems">
+                                    <div class="tree-item">家庭套餐</div>
+                                    <div class="tree-item">企业套餐</div>
+                                </div>
+                                
+                                <div class="tree-item">结算周期</div>
+                                <div class="tree-item">发票设置</div>
+                            </div>
+                            
+                            <div class="tree-content">
+                                <div class="param-form">
+                                    <div class="form-group">
+                                        <label for="param-name">参数名称</label>
+                                        <input type="text" id="param-name" class="form-control" value="基础服务费">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="param-code">参数代码</label>
+                                        <input type="text" id="param-code" class="form-control" value="BASE_FEE">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="param-value">参数值</label>
+                                        <input type="text" id="param-value" class="form-control" value="10.00">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="param-unit">单位</label>
+                                        <input type="text" id="param-unit" class="form-control" value="元/月">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="param-desc">参数描述</label>
+                                        <textarea id="param-desc" class="form-control" rows="3">所有业务的基础服务费用，不可取消</textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="param-status">状态</label>
+                                        <select id="param-status" class="form-control">
+                                            <option value="active">启用</option>
+                                            <option value="inactive">禁用</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary">取消</button>
+                                        <button type="button" class="btn btn-primary">保存</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+   
+    </main>
+
+    <script>
+        // 更新时间
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', {hour12: false});
+            document.getElementById('current-time').textContent = timeStr;
+        }
+        
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 侧边栏折叠
+        document.getElementById('toggle-sidebar-btn').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('sidebar-collapsed');
+            
+            const icon = this;
+            if (sidebar.classList.contains('sidebar-collapsed')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+            }
+        });
+
+        // 菜单切换
+        const menuItems = document.querySelectorAll('.menu-item');
+        const contentSections = document.querySelectorAll('.content-section');
+        
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有active类
+                menuItems.forEach(i => i.classList.remove('active'));
+                contentSections.forEach(section => section.classList.remove('active'));
+                
+                // 添加当前active类
+                this.classList.add('active');
+                const sectionId = this.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        // 响应式侧边栏
+        function handleResponsive() {
+            if (window.innerWidth <= 768) {
+                document.querySelector('.sidebar').classList.add('sidebar-collapsed');
+                document.getElementById('toggle-sidebar-btn').classList.remove('fa-chevron-left');
+                document.getElementById('toggle-sidebar-btn').classList.add('fa-chevron-right');
+            }
+        }
+        
+        window.addEventListener('resize', handleResponsive);
+        handleResponsive();
+
+        // 初始化图表
+        function initCharts() {
+            
+
+            // 收入趋势图表
+            const incomeTrendChart = echarts.init(document.getElementById('income-trend-chart'));
+            incomeTrendChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['电话收入', '宽带收入', '电视收入', '总收入']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['1月', '2月', '3月', '4月', '5月', '6月']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '电话收入',
+                        type: 'bar',
+                        data: [12000, 13000, 12500, 13500, 14000, 14500],
+                        itemStyle: {
+                            color: '#2196F3'
+                        }
+                    },
+                    {
+                        name: '宽带收入',
+                        type: 'bar',
+                        data: [45000, 47000, 48000, 50000, 52000, 54000],
+                        itemStyle: {
+                            color: '#4CAF50'
+                        }
+                    },
+                    {
+                        name: '电视收入',
+                        type: 'bar',
+                        data: [8000, 8200, 8400, 8500, 8600, 8800],
+                        itemStyle: {
+                            color: '#FF9800'
+                        }
+                    },
+                    {
+                        name: '总收入',
+                        type: 'line',
+                        data: [65000, 68200, 68900, 72000, 74600, 77300],
+                        itemStyle: {
+                            color: '#9C27B0'
+                        }
+                    }
+                ]
+            });
+
+            // 客户分布图表
+            const customerDistributionChart = echarts.init(document.getElementById('customer-distribution-chart'));
+            customerDistributionChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 10,
+                    data: ['个人用户', '家庭用户', '企业用户', '政府机构', '其他']
+                },
+                series: [
+                    {
+                        name: '客户类型',
+                        type: 'pie',
+                        radius: ['50%', '70%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 335, name: '个人用户', itemStyle: { color: '#2196F3' } },
+                            { value: 310, name: '家庭用户', itemStyle: { color: '#4CAF50' } },
+                            { value: 234, name: '企业用户', itemStyle: { color: '#FF9800' } },
+                            { value: 135, name: '政府机构', itemStyle: { color: '#9C27B0' } },
+                            { value: 1548, name: '其他', itemStyle: { color: '#607D8B' } }
+                        ]
+                    }
+                ]
+            });
+
+            // 订单趋势图
+            const orderTrendChart = echarts.init(document.getElementById('order-trend-chart'));
+            orderTrendChart.setOption({
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: '{b}<br/>{a0}: {c0}单<br/>{a1}: ¥{c1}万'
+                },
+                legend: {
+                    data: ['订单量', '营收金额'],
+                    right: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['1月', '2月', '3月', '4月', '5月', '6月']
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '订单量',
+                        position: 'left'
+                    },
+                    {
+                        type: 'value',
+                        name: '营收金额(万)',
+                        position: 'right'
+                    }
+                ],
+                series: [
+                    {
+                        name: '订单量',
+                        type: 'line',
+                        smooth: true,
+                        data: [1200, 1320, 1010, 1340, 1490, 1620],
+                        lineStyle: {
+                            color: '#3182ce'
+                        },
+                        itemStyle: {
+                            color: '#3182ce'
+                        }
+                    },
+                    {
+                        name: '营收金额',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        smooth: true,
+                        data: [120, 132, 101, 134, 149, 162],
+                        lineStyle: {
+                            color: '#dd6b20'
+                        },
+                        itemStyle: {
+                            color: '#dd6b20'
+                        }
+                    }
+                ]
+            });
+            
+            // 业务类型分布图
+            const businessTypeChart = echarts.init(document.getElementById('business-type-chart'));
+            businessTypeChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    right: 10,
+                    top: 'center',
+                    data: ['电话业务', '宽带业务', '电视业务', '组合套餐']
+                },
+                series: [
+                    {
+                        name: '业务类型',
+                        type: 'pie',
+                        radius: '70%',
+                        center: ['40%', '50%'],
+                        data: [
+                            { value: 1048, name: '宽带业务', itemStyle: { color: '#3182ce' } },
+                            { value: 735, name: '电视业务', itemStyle: { color: '#dd6b20' } },
+                            { value: 580, name: '电话业务', itemStyle: { color: '#38a169' } },
+                            { value: 484, name: '组合套餐', itemStyle: { color: '#805ad5' } }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            });
+            
+            // 订单状态分布图
+            const orderStatusChart = echarts.init(document.getElementById('order-status-chart'));
+            orderStatusChart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    right: 10,
+                    top: 'center',
+                    data: ['已完成', '处理中', '已取消']
+                },
+                series: [
+                    {
+                        name: '订单状态',
+                        type: 'pie',
+                        radius: ['50%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 1048, name: '已完成', itemStyle: { color: '#38a169' } },
+                            { value: 735, name: '处理中', itemStyle: { color: '#dd6b20' } },
+                            { value: 580, name: '已取消', itemStyle: { color: '#e53e3e' } }
+                        ]
+                    }
+                ]
+            });
+
+            // 窗口大小变化时重新调整图表大小
+            window.addEventListener('resize', function() {
+                incomeTrendChart.resize();
+                customerDistributionChart.resize();
+                orderTrendChart.resize();
+                businessTypeChart.resize();
+                orderStatusChart.resize();
+            });
+        }
+
+        // 页面加载完成后初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+          
+        
+            // 粒子动画效果
+            if (typeof particlesJS !== 'undefined') {
+                particlesJS('particles-js', {
+                    particles: {
+                        number: { value: 80, density: { enable: true, value_area: 800 } },
+                        color: { value: "#3f51b5" },
+                        shape: { type: "circle" },
+                        opacity: { value: 0.5, random: true },
+                        size: { value: 3, random: true },
+                        line_linked: { enable: true, distance: 150, color: "#3f51b5", opacity: 0.4, width: 1 },
+                        move: { enable: true, speed: 2, direction: "none", random: true, straight: false, out_mode: "out" }
+                    },
+                    interactivity: {
+                        detect_on: "canvas",
+                        events: {
+                            onhover: { enable: true, mode: "grab" },
+                            onclick: { enable: true, mode: "push" }
+                        },
+                        modes: {
+                            grab: { distance: 140, line_linked: { opacity: 1 } },
+                            push: { particles_nb: 4 }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
