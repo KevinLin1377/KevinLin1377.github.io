@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>号线管理子平台</title>
+    <link href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://s2.ssl.qhres2.com/static/56662140ef7d5d03.css" rel="stylesheet">
+    <script src="https://s2.ssl.qhres2.com/!2dd0bbf7/echats.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1a365d;
+            --secondary-blue: #2c5282;
+            --accent-orange: #dd6b20;
+            --light-gray: #f7fafc;
+            --dark-gray: #4a5568;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            transition: var(--transition);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            grid-template-rows: 60px 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            grid-column: 1 / 3;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent-orange);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            background-color: var(--white);
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .menu {
+            padding: 20px 0;
+        }
+
+        .menu-title {
+            padding: 10px 20px;
+            color: var(--dark-gray);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--dark-gray);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            color: var(--secondary-blue);
+        }
+
+        .menu-item:hover {
+            background-color: rgba(221, 107, 32, 0.1);
+            color: var(--accent-orange);
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .menu-item.active {
+            background-color: rgba(221, 107, 32, 0.1);
+            color: var(--accent-orange);
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .menu-item.active i {
+            color: var(--accent-orange);
+        }
+
+        /* 主内容区 */
+        .main-content {
+            padding: 20px;
+            overflow-y: auto;
+            background-color: var(--light-gray);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-orange);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #c05621;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--secondary-blue);
+            color: var(--secondary-blue);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(44, 82, 130, 0.1);
+        }
+
+        /* 卡片样式 */
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            background-color: var(--secondary-blue);
+            color: var(--white);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* 表格样式 */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table th {
+            background-color: var(--light-gray);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .table tr:hover {
+            background-color: rgba(221, 107, 32, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background-color: #e6fffa;
+            color: #38b2ac;
+        }
+
+        .badge-warning {
+            background-color: #fffaf0;
+            color: #ed8936;
+        }
+
+        .badge-danger {
+            background-color: #fff5f5;
+            color: #f56565;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark-gray);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(221, 107, 32, 0.2);
+        }
+
+        /* 粒子动画 */
+        .particles-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-blue);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px auto 1fr;
+            }
+
+            .header {
+                grid-column: 1;
+            }
+
+            .sidebar {
+                grid-row: 2;
+                grid-column: 1;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .main-content {
+                grid-row: 3;
+                grid-column: 1;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            width: 500px;
+            height: 300px;
+            
+           
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-project-diagram"></i>
+                <span>号线管理子平台</span>
+            </div>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/36" alt="用户头像">
+                <span>管理员</span>
+            </div>
+        </header>
+
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <nav class="menu">
+                <div class="menu-title">主菜单</div>
+                <a href="#" class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>系统概览</span>
+                </a>
+                
+                <div class="menu-title">号线管理</div>
+                <a href="#" class="menu-item" data-page="address">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>地名地址管理</span>
+                </a>
+                <a href="#" class="menu-item" data-page="wiring">
+                    <i class="fas fa-network-wired"></i>
+                    <span>配线管理</span>
+                </a>
+                <a href="#" class="menu-item" data-page="equipment">
+                    <i class="fas fa-server"></i>
+                    <span>配线设备管理</span>
+                </a>
+                
+                <div class="menu-title">查询与记录</div>
+                <a href="#" class="menu-item" data-page="query">
+                    <i class="fas fa-search"></i>
+                    <span>设备信息查询</span>
+                </a>
+                <a href="#" class="menu-item" data-page="history">
+                    <i class="fas fa-history"></i>
+                    <span>配线更改历史</span>
+                </a>
+                
+                <div class="menu-title">系统设置</div>
+                <a href="#" class="menu-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 系统概览页面 -->
+            <div id="dashboard" class="page fade-in">
+                <div class="page-header">
+                    <h1 class="page-title">系统概览</h1>
+                    <div>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 粒子动画 -->
+                <div class="particles-container">
+                    <canvas class="particles-canvas" id="particles"></canvas>
+                </div>
+                
+                <!-- 统计卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <span><i class="fas fa-map-marker-alt"></i> 地址总数</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="text-3xl font-bold text-primary-blue">1,248</h3>
+                            <p class="text-sm text-dark-gray">已规范地址: 1,120 (89.7%)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <span><i class="fas fa-network-wired"></i> 配线总数</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="text-3xl font-bold text-primary-blue">856</h3>
+                            <p class="text-sm text-dark-gray">最近更新: 2025-06-13</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <span><i class="fas fa-server"></i> 设备总数</span>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="text-3xl font-bold text-primary-blue">3,742</h3>
+                            <p class="text-sm text-dark-gray">在线设备: 3,512 (93.9%)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 最近更改记录 -->
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-history"></i> 最近更改记录</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>操作类型</th>
+                                        <th>操作内容</th>
+                                        <th>操作人</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2025-06-14 09:23</td>
+                                        <td>配线更新</td>
+                                        <td>更新了A区到B区的配线路径</td>
+                                        <td>张三</td>
+                                        <td><span class="badge badge-success">已完成</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-13 16:45</td>
+                                        <td>设备状态</td>
+                                        <td>更新了设备#D-2048的端口状态</td>
+                                        <td>李四</td>
+                                        <td><span class="badge badge-success">已完成</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-13 10:12</td>
+                                        <td>地址规范</td>
+                                        <td>规范了C区5栋的地址信息</td>
+                                        <td>王五</td>
+                                        <td><span class="badge badge-warning">审核中</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-12 14:30</td>
+                                        <td>设备添加</td>
+                                        <td>新增了D区交换机设备</td>
+                                        <td>赵六</td>
+                                        <td><span class="badge badge-success">已完成</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 地名地址管理页面 -->
+            <div id="address" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">地名地址管理</h1>
+                    <div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> 添加地址
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-list"></i> 地址列表</span>
+                        <div>
+                            <input type="text" class="form-control" placeholder="搜索地址..." style="width: 200px; display: inline-block;">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>地址ID</th>
+                                        <th>标准地址</th>
+                                        <th>别名</th>
+                                        <th>区域</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>AD-1001</td>
+                                        <td>北京市海淀区中关村南大街5号</td>
+                                        <td>中关村总部</td>
+                                        <td>北区</td>
+                                        <td><span class="badge badge-success">已规范</span></td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>AD-1002</td>
+                                        <td>北京市朝阳区建国路88号</td>
+                                        <td>朝阳分部</td>
+                                        <td>东区</td>
+                                        <td><span class="badge badge-success">已规范</span></td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>AD-1003</td>
+                                        <td>北京市丰台区科技园七区3号楼</td>
+                                        <td>丰台数据中心</td>
+                                        <td>南区</td>
+                                        <td><span class="badge badge-warning">待审核</span></td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 配线管理页面 -->
+            <div id="wiring" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">配线管理</h1>
+                    <div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> 添加配线
+                        </button>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-sync-alt"></i> 刷新路径
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-project-diagram"></i> 配线路径图</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="wiringChart"></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-list"></i> 配线列表</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>配线ID</th>
+                                        <th>起点</th>
+                                        <th>终点</th>
+                                        <th>长度(米)</th>
+                                        <th>状态</th>
+                                        <th>最后更新</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>WL-2001</td>
+                                        <td>AD-1001</td>
+                                        <td>AD-1002</td>
+                                        <td>1,200</td>
+                                        <td><span class="badge badge-success">正常</span></td>
+                                        <td>2025-06-10</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>WL-2002</td>
+                                        <td>AD-1001</td>
+                                        <td>AD-1003</td>
+                                        <td>2,500</td>
+                                        <td><span class="badge badge-warning">维护中</span></td>
+                                        <td>2025-06-12</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 配线设备管理页面 -->
+            <div id="equipment" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">配线设备管理</h1>
+                    <div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i> 添加设备
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-server"></i> 设备状态概览</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="equipmentChart"></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-list"></i> 设备列表</span>
+                        <div>
+                            <select class="form-control" style="width: 150px; display: inline-block;">
+                                <option>全部状态</option>
+                                <option>在线</option>
+                                <option>离线</option>
+                                <option>维护中</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>设备ID</th>
+                                        <th>设备名称</th>
+                                        <th>类型</th>
+                                        <th>位置</th>
+                                        <th>端口状态</th>
+                                        <th>最后检测</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>EQ-3001</td>
+                                        <td>核心交换机A</td>
+                                        <td>交换机</td>
+                                        <td>AD-1001</td>
+                                        <td>24/48</td>
+                                        <td>2025-06-14 08:30</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i> 配置
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>EQ-3002</td>
+                                        <td>路由器B</td>
+                                        <td>路由器</td>
+                                        <td>AD-1002</td>
+                                        <td>8/16</td>
+                                        <td>2025-06-14 09:15</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i> 配置
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>EQ-3003</td>
+                                        <td>光纤终端盒C</td>
+                                        <td>终端设备</td>
+                                        <td>AD-1003</td>
+                                        <td>12/24</td>
+                                        <td>2025-06-13 16:45</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-edit"></i> 配置
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 设备信息查询页面 -->
+            <div id="query" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">设备信息查询</h1>
+                    <div>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-search"></i> 查询条件</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">设备ID</label>
+                                <input type="text" class="form-control" placeholder="输入设备ID">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">设备类型</label>
+                                <select class="form-control">
+                                    <option value="">全部</option>
+                                    <option value="switch">交换机</option>
+                                    <option value="router">路由器</option>
+                                    <option value="terminal">终端设备</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">位置</label>
+                                <input type="text" class="form-control" placeholder="输入位置">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-primary w-full">
+                                    <i class="fas fa-search"></i> 查询
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-list"></i> 查询结果</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>设备ID</th>
+                                        <th>设备名称</th>
+                                        <th>类型</th>
+                                        <th>位置</th>
+                                        <th>上级设备</th>
+                                        <th>下级设备</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>EQ-3001</td>
+                                        <td>核心交换机A</td>
+                                        <td>交换机</td>
+                                        <td>AD-1001</td>
+                                        <td>-</td>
+                                        <td>EQ-3002, EQ-3003</td>
+                                        <td><span class="badge badge-success">在线</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>EQ-3002</td>
+                                        <td>路由器B</td>
+                                        <td>路由器</td>
+                                        <td>AD-1002</td>
+                                        <td>EQ-3001</td>
+                                        <td>EQ-3004</td>
+                                        <td><span class="badge badge-success">在线</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>EQ-3003</td>
+                                        <td>光纤终端盒C</td>
+                                        <td>终端设备</td>
+                                        <td>AD-1003</td>
+                                        <td>EQ-3001</td>
+                                        <td>-</td>
+                                        <td><span class="badge badge-warning">维护中</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 配线更改历史页面 -->
+            <div id="history" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">配线更改历史</h1>
+                    <div>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-download"></i> 导出
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-filter"></i> 筛选条件</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">开始日期</label>
+                                <input type="date" class="form-control" value="2025-06-01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">结束日期</label>
+                                <input type="date" class="form-control" value="2025-06-14">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">操作类型</label>
+                                <select class="form-control">
+                                    <option value="">全部</option>
+                                    <option value="add">添加</option>
+                                    <option value="update">更新</option>
+                                    <option value="delete">删除</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-primary w-full">
+                                    <i class="fas fa-filter"></i> 筛选
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-history"></i> 历史记录</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>操作类型</th>
+                                        <th>操作内容</th>
+                                        <th>操作人</th>
+                                        <th>详情</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2025-06-14 09:23</td>
+                                        <td>配线更新</td>
+                                        <td>更新了A区到B区的配线路径</td>
+                                        <td>张三</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-info-circle"></i> 查看
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-13 16:45</td>
+                                        <td>设备状态</td>
+                                        <td>更新了设备#D-2048的端口状态</td>
+                                        <td>李四</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-info-circle"></i> 查看
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-13 10:12</td>
+                                        <td>地址规范</td>
+                                        <td>规范了C区5栋的地址信息</td>
+                                        <td>王五</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-info-circle"></i> 查看
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-06-12 14:30</td>
+                                        <td>设备添加</td>
+                                        <td>新增了D区交换机设备</td>
+                                        <td>赵六</td>
+                                        <td>
+                                            <button class="btn btn-outline btn-sm">
+                                                <i class="fas fa-info-circle"></i> 查看
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 系统设置页面 -->
+            <div id="settings" class="page" style="display: none;">
+                <div class="page-header">
+                    <h1 class="page-title">系统设置</h1>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-user-cog"></i> 用户设置</span>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-group">
+                                    <label class="form-label">用户名</label>
+                                    <input type="text" class="form-control" value="管理员" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">邮箱</label>
+                                    <input type="email" class="form-control" value="admin@example.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">新密码</label>
+                                    <input type="password" class="form-control" placeholder="输入新密码">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">确认密码</label>
+                                    <input type="password" class="form-control" placeholder="再次输入新密码">
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> 保存设置
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-cog"></i> 系统参数</span>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <label class="form-label">系统名称</label>
+                                <input type="text" class="form-control" value="号线管理系统">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">数据备份频率</label>
+                                <select class="form-control">
+                                    <option>每日</option>
+                                    <option selected>每周</option>
+                                    <option>每月</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">日志保留天数</label>
+                                <input type="number" class="form-control" value="30">
+                            </div>
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> 保存设置
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 页面切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            const pages = document.querySelectorAll('.page');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 移除所有active类
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    
+                    // 添加当前active类
+                    this.classList.add('active');
+                    
+                    // 隐藏所有页面
+                    pages.forEach(page => page.style.display = 'none');
+                    
+                    // 显示当前页面
+                    const pageId = this.getAttribute('data-page');
+                    document.getElementById(pageId).style.display = 'block';
+                });
+            });
+            
+            // 默认显示dashboard页面
+            document.getElementById('dashboard').style.display = 'block';
+        });
+        
+        // 粒子动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置canvas尺寸
+            function resizeCanvas() {
+                const container = canvas.parentElement;
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 粒子系统
+            const particles = [];
+            const particleCount = Math.floor(canvas.width / 10);
+            
+            // 创建粒子
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    speedX: Math.random() * 1 - 0.5,
+                    speedY: Math.random() * 1 - 0.5,
+                    color: `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.1})`
+                });
+            }
+            
+            // 绘制粒子
+            function drawParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 更新和绘制粒子
+                particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    
+                    // 边界检查
+                    if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+                    
+                    // 绘制粒子
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                });
+                
+                // 绘制连接线
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p1 = particles[i];
+                        const p2 = particles[j];
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 100})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                
+                requestAnimationFrame(drawParticles);
+            }
+            
+            drawParticles();
+        });
+        
+        // 图表初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 配线路径图
+            const wiringChart = echarts.init(document.getElementById('wiringChart'));
+            const wiringOption = {
+                tooltip: {},
+                legend: {
+                    data: ['配线路径']
+                },
+                series: [{
+                    name: '配线路径',
+                    type: 'graph',
+                    layout: 'force',
+                    data: [
+                        {id: 'AD-1001', name: '中关村总部', symbolSize: 30, category: 0},
+                        {id: 'AD-1002', name: '朝阳分部', symbolSize: 30, category: 0},
+                        {id: 'AD-1003', name: '丰台数据中心', symbolSize: 30, category: 0}
+                    ],
+                    links: [
+                        {source: 'AD-1001', target: 'AD-1002', value: '1.2公里'},
+                        {source: 'AD-1001', target: 'AD-1003', value: '2.5公里'}
+                    ],
+                    categories: [{name: '地址节点'}],
+                    roam: true,
+                    label: {
+                        show: true,
+                        position: 'right'
+                    },
+                    force: {
+                        repulsion: 100,
+                        edgeLength: 100
+                    },
+                    lineStyle: {
+                        color: 'source',
+                        curveness: 0.2
+                    },
+                    emphasis: {
+                        lineStyle: {
+                            width: 4
+                        }
+                    }
+                }],
+                color: ['#2c5282', '#dd6b20']
+            };
+            wiringChart.setOption(wiringOption);
+            
+            // 设备状态图
+            const equipmentChart = echarts.init(document.getElementById('equipmentChart'));
+            const equipmentOption = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    top: '5%',
+                    left: 'center'
+                },
+                series: [
+                    {
+                        name: '设备状态',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 3512, name: '在线' },
+                            { value: 150, name: '离线' },
+                            { value: 80, name: '维护中' }
+                        ],
+                        color: ['#38a169', '#e53e3e', '#dd6b20']
+                    }
+                ]
+            };
+            equipmentChart.setOption(equipmentOption);
+            
+            // 窗口大小变化时重新调整图表大小
+            window.addEventListener('resize', function() {
+                wiringChart.resize();
+                equipmentChart.resize();
+            });
+        });
+    </script>
+</body>
+</html>
